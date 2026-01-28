@@ -1,96 +1,78 @@
-import { useState } from "react";
-import { TextField, Button, Card, CardContent, Typography, Box } from "@mui/material";
-import API from "../api/axiosConfig";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../api/axiosConfig";
+import { Box, TextField, Button, Typography, Paper } from "@mui/material";
 
 export default function Register() {
-  const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await API.post("/register", form);
-    alert("Registration successful! Please login.");
-    navigate("/login");
+    try {
+      await API.post("/register", form);
+      alert("User registered successfully!");
+      navigate("/login");
+    } catch (err) {
+      alert(err.response?.data?.message || "Registration failed");
+    }
   };
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "linear-gradient(135deg, #667eea, #764ba2)",
+        height: "100vh",
+        background: "linear-gradient(120deg, #89f7fe, #66a6ff)",
       }}
     >
-      <Card
-        sx={{
-          width: 400,
-          padding: 3,
-          borderRadius: 4,
-          boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-        }}
-      >
-        <CardContent>
-          <Typography variant="h4" align="center" gutterBottom>
-            Create Account 🚀
-          </Typography>
-
-          <form onSubmit={handleSubmit}>
-            <TextField
-              fullWidth
-              label="Full Name"
-              margin="normal"
-              variant="outlined"
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-
-            <TextField
-              fullWidth
-              label="Email Address"
-              type="email"
-              margin="normal"
-              variant="outlined"
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-
-            <TextField
-              fullWidth
-              label="Password"
-              type="password"
-              margin="normal"
-              variant="outlined"
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-            />
-
-            <Button
-              fullWidth
-              type="submit"
-              variant="contained"
-              sx={{
-                mt: 2,
-                py: 1.2,
-                fontSize: "1rem",
-                borderRadius: 3,
-                background: "linear-gradient(90deg, #667eea, #764ba2)",
-              }}
-            >
-              Register
-            </Button>
-          </form>
-
-          <Typography align="center" sx={{ mt: 2 }}>
-            Already have an account?{" "}
-            <span
-              style={{ color: "#667eea", cursor: "pointer" }}
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </span>
-          </Typography>
-        </CardContent>
-      </Card>
+      <Paper sx={{ p: 5, width: 400 }}>
+        <Typography variant="h4" mb={3} align="center">
+          Register
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="Name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            margin="normal"
+          />
+          <Button
+            fullWidth
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3 }}
+          >
+            Register
+          </Button>
+        </form>
+      </Paper>
     </Box>
   );
 }

@@ -1,16 +1,16 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:8080/api/v1/auth",
+  baseURL: "http://localhost:8080/api/v1/auth", // your Spring Boot backend
 });
 
-// Add JWT token to every request
-API.interceptors.request.use((req) => {
+// Attach JWT token if present
+API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
+    config.headers["Authorization"] = `Bearer ${token}`;
   }
-  return req;
+  return config;
 });
 
 export default API;

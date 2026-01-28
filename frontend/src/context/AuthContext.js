@@ -1,29 +1,34 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const storedToken = localStorage.getItem("token");
+  const [user, setUser] = useState(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      return { email: decoded.sub, role: decoded.role };
+    }
+    return null;
+  });
 
-  const [token, setToken] = useState(storedToken);
-  const [role, setRole] = useState(storedToken ? jwtDecode(storedToken).role : null);
-
-  const login = (jwt) => {
-    localStorage.setItem("token", jwt);
-    setToken(jwt);
-    setRole(jwtDecode(jwt).role); // extract role from token
+  const login = (token) => {
+    localStorage.setItem("token", token);
+    const decoded = jwtDecode(token);
+    setUser({ email: decoded.sub, role: decoded.role });
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    setToken(null);
-    setRole(null);
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ token, role, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);
